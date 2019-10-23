@@ -2,7 +2,9 @@
 
 This project attempts to automate the installation of Cloud Foundry on top of Kubernetes via the Eirini project. It adds some optional components such as `nginx-ingress` and `cert-manager` to improve the automation of the infrastructure requirements.
 
-Helmfile is used as the deployment mechansim to tie multiple Helm Charts together and to provide a gitops style deployment workflow. it is expected that you'll have seperate `env` directory(s) containing the customizations for a particular environment or cluster.
+Currently it should work for any Kubernetes cluster (tested on GKE and PKS) running on Google Cloud.
+
+Helmfile is used as the deployment mechanism to tie multiple Helm Charts together and to provide a gitops style deployment workflow. it is expected that you'll have separate `env` directory(s) containing the customizations for a particular environment or cluster.
 
 For the most part you should just need to edit `envs/example-gke/envs.sh` and fill it in with your details. This is a shell script that will export environment variables to be used by Helmfile. The reason for this is that if you have passwords/secrets you can store them outside of git and have the script extract them from wherever you keep them.
 
@@ -19,6 +21,8 @@ It's expected that you already have the basic Kubernetes client tools like `kube
 ## Example GKE
 
 This example shows installing Eirini to a GKE Cluster with a Google managed DNS domain.
+
+> Note: This also works with PKS running on Google Cloud, and likely any other Kubernetes cluster running on Google Cloud.
 
 ### Configuration
 
@@ -39,6 +43,8 @@ Load the configuration into Environment Variables:
 ```
 
 ### Create GKE Cluster
+
+> Note [skip](#create-a-gcp-service-account-for-dns-management) this section if you are running PKS on GCP and go straight to [creating a gcp service account for dns management](https://github.com/paulczar/helmfile-eirini#create-a-gcp-service-account-for-dns-management).
 
 Create a GKE Cluster called `example-eirini`:
 
@@ -134,13 +140,13 @@ kubectl apply --validate=false -f resources/cert-manager/crds.yaml
 Run a `helmfile diff` to ensure there's no known errors:
 
 ```console
-helmfile  --state-values-file $ENV_DIR/values.yaml diff
+helmfile --state-values-file $ENV_DIR/values.yaml diff
 ```
 
 If no errors are thrown go ahead and deploy:
 
 ```console
-helmfile  --state-values-file $ENV_DIR/values.yaml apply
+helmfile --state-values-file $ENV_DIR/values.yaml apply
 ```
 
 ### Sit back and wait for Eirini to get itself running
