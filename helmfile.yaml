@@ -13,10 +13,6 @@ helmDefaults:
 repositories:
   - name: jetstack
     url: https://charts.jetstack.io
-{{- if .Values.harbor.enabled }}
-  - name: harbor
-    url: https://helm.goharbor.io
-{{- end }}
 {{- if default false .Values.eirini.enabled }}
   - name: eirini
     url: https://cloudfoundry-incubator.github.io/eirini-release
