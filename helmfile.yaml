@@ -1,0 +1,99 @@
+# ensure variables are set
+# {{ if requiredEnv "GOOGLE_PROJECT_ID"}}{{ end }}
+# {{ if requiredEnv "EXTERNAL_DNS_DOMAIN" }}{{ end }}
+# {{ if requiredEnv "CERT_MANAGER_EMAIL" }}{{ end }}
+# {{ if requiredEnv "EIRINI_BITS_SECRET" }}{{ end }}
+# {{ if requiredEnv "EIRINI_ADMIN_PASSWORD" }}{{ end }}
+# {{ if requiredEnv "EIRINI_ADMIN_CLIENT_SECRET" }}{{ end }}
+
+helmDefaults:
+  timeout: 600
+  recreatePods: true
+
+repositories:
+  - name: jetstack
+    url: https://charts.jetstack.io
+{{- if .Values.harbor.enabled }}
+  - name: harbor
+    url: https://helm.goharbor.io
+{{- end }}
+{{- if default false .Values.eirini.enabled }}
+  - name: eirini
+    url: https://cloudfoundry-incubator.github.io/eirini-release
+  - name: bits
+    url: https://cloudfoundry-incubator.github.io/bits-service-release/helm
+  - name: stratos
+    url: https://cloudfoundry.github.io/stratos
+{{- end }}
+
+releases:
+  ## Mystique is a chart embedded in this repo that can be used to create
+  ## General kubernetes resources such as secrets from files as shown here
+  - name: cluster-system-extras
+    namespace: cluster-system
+    chart: ./charts/mystique
+    values:
+      - values/cluster-system/extras.yaml.gotmpl
+
+  - name: ingress
+    namespace: cluster-system
+    chart: stable/nginx-ingress
+    version: 1.6.17
+    values:
+      - values/cluster-system/ingress.yaml.gotmpl
+
+  - name: external-dns
+    namespace: cluster-system
+    version: 2.6.4
+    chart: stable/external-dns
+    values:
+      - values/cluster-system/external-dns.yaml.gotmpl
+
+  - name: cert-manager
+    namespace: cluster-system
+    chart: jetstack/cert-manager
+    version: v0.11.0
+    values:
+      - values/cluster-system/cert-manager.yaml.gotmpl
+
+{{- if default false .Values.eirini.enabled }}
+  - name: uaa
+    namespace: uaa
+    chart: eirini/uaa
+    version: 2.18.0
+    values:
+      - values/eirini/values.yaml.gotmpl
+
+  {{- if eq "gcp" (env "CLOUD_PROVIDER") }}
+  - name: cf-extras
+    namespace: cf
+    chart: ./charts/mystique
+    values:
+      - manifests:
+          - name: stratos-standard
+            kind: StorageClass
+            apiVersion: storage.k8s.io/v1
+            body:
+              provisioner: kubernetes.io/gce-pd
+              volumeBindingMode: WaitForFirstConsumer
+              parameters:
+                type: pd-standard
+  {{- end }}
+
+  - name: cf
+    namespace: scf
+    chart: eirini/cf
+    version: 2.16.4
+    values:
+      - values/eirini/values.yaml.gotmpl
+
+  - name: stratos
+    namespace: stratos
+    chart: stratos/console
+    version: 2.6.0-rc.1
+    values:
+      - values/eirini/values.yaml.gotmpl
+      {{- if eq "gcp" (env "CLOUD_PROVIDER") }}
+      - storageClass: stratos-standard
+      {{- end }}
+{{- end }}
