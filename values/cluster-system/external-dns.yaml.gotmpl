@@ -5,7 +5,7 @@ rbac:
   create: "true"
 provider: google
 google:
-  project: {{ env "CLUSTER_PROJECT"}}
+  project: {{ env "GOOGLE_PROJECT_ID"}}
   serviceAccountSecret: {{ requiredEnv "EXTERNAL_DNS_SECRET"}}
 domainFilters:
   - {{ requiredEnv "EXTERNAL_DNS_DOMAIN" }}

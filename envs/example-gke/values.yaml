@@ -1,2 +1,19 @@
 eirini:
   enabled: true
+
+grafana:
+  enabled: true
+
+prometheus:
+  enabled: true
+
+prometheus:
+  enabled: true
+
+grafana:
+  enabled: true
+  dashboards:
+    prometheus-stats:
+      gnetId: 2
+      revision: 2
+      datasource: prometheus

@@ -1,0 +1,31 @@
+persistence:
+  enabled: true
+
+adminPassword: {{ requiredEnv "GRAFANA_ADMIN_PASSWORD" }}
+
+datasources:
+  datasources.yaml:
+   apiVersion: 1
+   datasources:
+   - name: prometheus
+     type: prometheus
+     url: http://prometheus-server.prometheus
+     access: proxy
+     isDefault: true
+
+dashboardProviders:
+ dashboardproviders.yaml:
+   apiVersion: 1
+   providers:
+   - name: 'default'
+     orgId: 1
+     folder: ''
+     type: file
+     disableDeletion: false
+     editable: true
+     options:
+       path: /var/lib/grafana/dashboards/default
+
+dashboards:
+  default:
+{{ .Values.grafana.dashboards | toYaml | indent 4 }}

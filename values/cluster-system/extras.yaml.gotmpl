@@ -17,7 +17,7 @@ manifests:
         solvers:
         - dns01:
             clouddns:
-              project: {{ requiredEnv "CLUSTER_PROJECT" }}
+              project: {{ requiredEnv "GOOGLE_PROJECT_ID" }}
               serviceAccountSecretRef:
                 name: google-credentials
                 key: "credentials.json"

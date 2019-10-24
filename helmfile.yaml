@@ -8,7 +8,7 @@
 
 helmDefaults:
   timeout: 600
-  recreatePods: true
+  recreatePods: false
 
 repositories:
   - name: jetstack
@@ -92,4 +92,22 @@ releases:
       {{- if eq "gcp" (env "CLOUD_PROVIDER") }}
       - storageClass: stratos-standard
       {{- end }}
+{{- end }}
+
+{{- if default false .Values.grafana.enabled }}
+  - name: grafana
+    namespace: grafana
+    chart: stable/grafana
+    version: 3.3.10
+    values:
+      - values/grafana/values.yaml.gotmpl
+{{- end }}
+
+{{- if default false .Values.prometheus.enabled }}
+  - name: prometheus
+    namespace: prometheus
+    chart: stable/prometheus
+    version: 8.11.4
+    values:
+      - values/prometheus/values.yaml.gotmpl
 {{- end }}
