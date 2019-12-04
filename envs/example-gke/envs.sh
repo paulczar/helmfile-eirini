@@ -17,7 +17,8 @@ export GOOGLE_PROJECT_ID=
 # the location of a GCP auth JSON file for a service-account
 # needs perms for a bunch of stuff.
 export GOOGLE_APPLICATION_CREDENTIALS_FILE="$ENV_DIR/key.json"
-export GOOGLE_APPLICATION_CREDENTIALS_SECRET=$(cat ${GOOGLE_APPLICATION_CREDENTIALS_FILE} | base64 -w0)
+## If this fails ... you can run the base64 command manually and paste the results in here
+export GOOGLE_APPLICATION_CREDENTIALS_SECRET=$(base64 -w0 -i ${GOOGLE_APPLICATION_CREDENTIALS_FILE})
 
 ## external-dns
 # pre-created secret containing your GCP creds. gcp-lb-tags chart creates a secret
