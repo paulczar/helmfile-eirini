@@ -20,7 +20,7 @@ It's expected that you already have the basic Kubernetes client tools like `kube
 
 ## Example GKE
 
-This example shows installing Eirini to a GKE Cluster with a Google managed DNS domain.
+This example shows installing Eirini to a GKE Cluster with a _Google managed DNS_ domain.
 
 > Note: This also works with PKS running on Google Cloud, and likely any other Kubernetes cluster running on Google Cloud.
 
@@ -67,6 +67,14 @@ NAME                                            STATUS   ROLES    AGE   VERSION
 gke-example-eirini-default-pool-67d0c7ee-41gt   Ready    <none>   11m   v1.13.10-gke.0
 gke-example-eirini-default-pool-67d0c7ee-c53z   Ready    <none>   11m   v1.13.10-gke.0
 gke-example-eirini-default-pool-67d0c7ee-m0v5   Ready    <none>   11m   v1.13.10-gke.0
+```
+
+### Create a DNS Zone
+
+```console
+gcloud dns managed-zones create eirini-$ENV_NAME \
+  --dns-name $EXTERNAL_DNS_DOMAIN \
+  --description "managed zone for eirini $ENV_NAME"
 ```
 
 ### Create a GCP service account for DNS management
